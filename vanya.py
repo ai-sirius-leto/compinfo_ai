@@ -11,16 +11,3 @@ def write(time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ra
     conn.execute('INSERT INTO vanya VALUES (?, ?, ?, ?, ?, ?, ?)', (time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage))
     conn.commit()
     conn.close()
-        
-        
-
-
-def main():
-    
-    
-
-
-
-
-
-main()
