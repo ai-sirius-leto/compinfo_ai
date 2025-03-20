@@ -18,11 +18,19 @@ def write(time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ra
 
 def main():
     processor_usage = psutil.cpu_percent(interval=0.5)
-    
-    
+
     temperature = psutil.sensors_temperatures()
     pprint(temperature)
     
+    # TODO: bleudev: сделать средние
+    avg_curr = -1
+    avg_crit = -1
+    for d in temperature['coretemp']:
+        if avg_curr == -1:
+            avg_curr = d.current
+        else:
+            avg_curr = (avg_curr + d.current) / 2
+        print(d.current, d.critical)
 
 
 
