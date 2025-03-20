@@ -19,7 +19,6 @@ def write(time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ra
 
 def main():
     # CPU temperature
-    processor_usage = psutil.cpu_percent(interval=0.5)
     temperature = psutil.sensors_temperatures()
 
     curr = [i.current for i in temperature['coretemp']]
@@ -29,17 +28,26 @@ def main():
     avg_curr = sum(curr) / len(curr)
     avg_crit = sum(crit) / len(crit)
     
-    print(avg_curr, avg_crit, processor_usage)
+    print(avg_curr, avg_crit)
     
-    #Температура видеокарты
-    temperature_gpu = GPUtil.getGPUs()[0].temperature
-    
-    #Загрузка видеокарты
-    gpu_usage = GPUtil.getGPUs()[0].load
+    try:
+        #Температура видеокарты
+        temperature_gpu = GPUtil.getGPUs()[0].temperature
+        #Загрузка видеокарты
+        gpu_usage = GPUtil.getGPUs()[0].load
+    except IndexError:
+        print('Видеокарта не обнаружена')
+        temperature_gpu = 0
+        gpu_usage = 0
 
 
     #Загрузка процессора
     processor_usage = psutil.cpu_percent(interval=1)
+    
+    t = int((time.time() - psutil.boot_time()) * 10**3)
+    ram_usage = psutil.virtual_memory().percent
+    disk_usage = psutil.disk_usage('/').percent
+    write(t, avg_curr, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage)
 
 
 main()
