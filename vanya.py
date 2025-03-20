@@ -1,6 +1,7 @@
 import sqlite3
 import psutil
 import time
+import GPUtil
 from pprint import pprint
 conn = sqlite3.connect('vanya.db')
 conn.execute('CREATE TABLE IF NOT EXISTS vanya (time int, temperature_cpu float, temperature_gpu float, processor_usage float, gpu_usage float, ram_usage float, disk_usage float)')
@@ -20,8 +21,7 @@ def main():
     processor_usage = psutil.cpu_percent(interval=0.5)
 
     temperature = psutil.sensors_temperatures()
-    pprint(temperature)
-    
+    """
     # TODO: bleudev: сделать средние
     avg_curr = -1
     avg_crit = -1
@@ -31,9 +31,19 @@ def main():
         else:
             avg_curr = (avg_curr + d.current) / 2
         print(d.current, d.critical)
+    """
+    
+    #Температура видеокарты
+    temperature_gpu = GPUtil.getGPUs()[0].temperature
+    
+    #Загрузка видеокарты
+    gpu_usage = GPUtil.getGPUs()[0].load
 
 
-
+    #Загрузка процессора
+    processor_usage = psutil.cpu_percent(interval=1)
+    
+    
 
 
 main()
