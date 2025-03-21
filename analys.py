@@ -3,21 +3,18 @@ import psutil
 import time
 import GPUtil
 from pprint import pprint
-conn = sqlite3.connect('vanya.db')
-conn.execute('CREATE TABLE IF NOT EXISTS vanya (time int, temperature_cpu float, temperature_gpu float, processor_usage float, gpu_usage float, ram_usage float, disk_usage float)')
+conn = sqlite3.connect('data.db')
+conn.execute('CREATE TABLE IF NOT EXISTS vanya (uptime int, temperature_cpu float, temperature_gpu float, processor_usage float, gpu_usage float, ram_usage float, disk_usage float)')
 conn.commit()
 conn.close()
 
-def write(time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage):
-    conn = sqlite3.connect('vanya.db')
-    conn.execute('INSERT INTO vanya VALUES (?, ?, ?, ?, ?, ?, ?)', (time, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage))
+def write(uptime, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage):
+    conn = sqlite3.connect('data.db')
+    conn.execute('INSERT INTO vanya VALUES (?, ?, ?, ?, ?, ?, ?)', (uptime, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage))
     conn.commit()
     conn.close()
         
-        
-
-
-def main():
+def analys():
     # CPU temperature
     temperature = psutil.sensors_temperatures()
 
@@ -28,7 +25,7 @@ def main():
     avg_curr = sum(curr) / len(curr)
     avg_crit = sum(crit) / len(crit)
     
-    print(avg_curr, avg_crit)
+    temperature_cpu = avg_curr
     
     try:
         #Температура видеокарты
@@ -37,17 +34,21 @@ def main():
         gpu_usage = GPUtil.getGPUs()[0].load
     except IndexError:
         print('Видеокарта не обнаружена')
-        temperature_gpu = 0
-        gpu_usage = 0
+        temperature_gpu = -1
+        gpu_usage = -1
 
 
     #Загрузка процессора
     processor_usage = psutil.cpu_percent(interval=1)
     
-    t = int((time.time() - psutil.boot_time()) * 10**3)
+    #Текущее время работы
+    uptime = int((time.time() - psutil.boot_time()) * 10**3)
+    
+    #Загруженность диска и ОЗУ
     ram_usage = psutil.virtual_memory().percent
     disk_usage = psutil.disk_usage('/').percent
-    write(t, avg_curr, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage)
+ 
+    write(uptime, temperature_cpu, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage)
 
-
-main()
+if __name__ == '__main__':
+    analys()
