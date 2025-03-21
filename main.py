@@ -1,17 +1,48 @@
 import flet as ft
-from analys import analys
 
-# for i in range(1, 11):
-#     analys()
-#     print(f"{i}/10")
-
-INFO_FStr = 'Время работы: {uptime}\nТемпература процессора: {t_cpu}\nТемпература видеокарты: {t_gpu}\nЗагруженность процессора: {u_cpu}\nЗагруженность видеокарты: {u_gpu}\nЗагруженность диска:{u_disk}'
+from pages.chart import page_chart
+from pages.now import page_now
+from pages.settings import page_settings
 
 
 def main(page: ft.Page):
     page.title = 'Анализатор компьютера'
-    page.add(ft.Text('))
+    page.on_disconnect = lambda *a, **k: exit(0)
+    
+    def change_destination(*_):
+        page.controls.clear()
+        match page.navigation_bar.selected_index:
+            case 0:
+                page_now(page)
+            case 1:
+                page_chart(page)
+            case 2:
+                page_settings(page)
+    
+    page.navigation_bar = ft.NavigationBar(
+        destinations=[
+            ft.NavigationBarDestination(
+                icon=ft.Icons.TIMER_OUTLINED,
+                selected_icon=ft.Icons.TIMER,
+                label="Сейчас"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.TIMELINE_OUTLINED,
+                selected_icon=ft.Icons.TIMELINE,
+                label="График"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.SETTINGS_OUTLINED,
+                selected_icon=ft.Icons.SETTINGS,
+                label="Настройки",
+            ),
+        ],
+        on_change=change_destination
+    )
+    page.update()
+    
+    page_now(page)
 
 if __name__ == '__main__':
-    ft.app(main)
+    ft.app(main, use_color_emoji=True)
 

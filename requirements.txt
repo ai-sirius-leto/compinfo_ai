@@ -2,4 +2,4 @@ psutil
 GPUtil
 setuptools
 flet
-# flet==0.19.0
+ufpy
