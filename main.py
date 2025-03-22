@@ -8,6 +8,8 @@ from pages.settings import page_settings
 def main(page: ft.Page):
     page.title = 'Анализатор компьютера'
     page.on_disconnect = lambda *a, **k: exit(0)
+    page.window.height = 10
+    page.window.width = 10
     
     def change_destination(*_):
         page.controls.clear()
