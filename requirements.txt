@@ -3,3 +3,5 @@ GPUtil
 setuptools
 flet
 ufpy
+matplotlib
+numpy
