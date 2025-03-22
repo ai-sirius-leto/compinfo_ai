@@ -30,11 +30,19 @@ def page_chart(page: ft.Page):
             r = cur.fetchall()
             cur.close()
         
-        points = np.array(sorted([[i[0], i[1]] for i in r], key=lambda x: x[0]))
+        points = np.array(sorted(r, key=lambda x: x[0]))
 
         fig, axs = plt.subplots(1, 1)
         
-        axs.plot(points[:, 0], points[:, 1])
+        axs.plot(points[:, 0], points[:, 1], label='t процессора (°C)', color='yellow')
+        axs.plot(points[:, 0], points[:, 2], color='red')
+        if points[0, 3] != -1:
+            axs.plot(points[:, 0], points[:, 3], label='t видеокарты (°C)', color='green')
+        axs.plot(points[:, 0], points[:, 4], label='использование процессора (%)', color='orange')
+        if points[0, 5] != -1:
+            axs.plot(points[:, 0], points[:, 5], label='использование видеокарты (%)', color='blue')
+        axs.plot(points[:, 0], points[:, 6], label='использование ОЗУ (%)', color='purple')
+        axs.legend()
         axs.set_xlim(sut, ut)
         axs.set_xlabel("время с момента включения компьютера")
         axs.grid(True, color="white", linestyle="--", linewidth=0.5)
@@ -48,6 +56,9 @@ def page_chart(page: ft.Page):
         fig.tight_layout()
         return fig
 
+    plt.rcParams['legend.labelcolor'] = 'white'
+    plt.rcParams['legend.facecolor'] = 'black'
+    plt.rcParams['legend.edgecolor'] = 'black'
     chart = MatplotlibChart(__get_plot(), isolated=True, transparent=True, expand=True)
     
     def update_chart():
