@@ -1,6 +1,7 @@
 from sqlite3 import connect
 import flet as ft
 from matplotlib.figure import Figure
+from matplotlib.pyplot import close as plt_close
 
 from analys import analys, read_last
 from utils import get_uptime_str, smooth_resize
@@ -22,7 +23,6 @@ def page_chart(page: ft.Page):
         analys()
         ut = read_last()[0]
         sut = ut - 120000
-        mut = ut - 60000
         
         with connect('data.db') as conn:
             cur = conn.cursor()
@@ -52,8 +52,10 @@ def page_chart(page: ft.Page):
     
     def update_chart():
         while page.navigation_bar.selected_index == 1:
+            fig = chart.figure
             chart.figure = __get_plot()
             chart.update()
+            plt_close(fig)
 
     page.add(chart)
     update_chart()
