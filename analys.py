@@ -59,6 +59,6 @@ def analys():
     disk_usage = psutil.disk_usage('/').percent
  
     write(uptime, temperature_cpu, avg_crit, temperature_gpu, processor_usage, gpu_usage, ram_usage, disk_usage)
-
+    
 if __name__ == '__main__':
     analys()
