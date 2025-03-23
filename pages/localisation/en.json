@@ -1,0 +1,12 @@
+{
+    "wintitle": "The Predictor",
+    "navbar": {
+        "now": "Now",
+        "chart": "Chart",
+        "settings": "Settings"
+    },
+    "settings": {
+        "title": "Settings",
+        "lang": "Language"
+    }
+}

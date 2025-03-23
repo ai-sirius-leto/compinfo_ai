@@ -3,10 +3,11 @@ import flet as ft
 from pages.chart import page_chart
 from pages.now import page_now
 from pages.settings import page_settings
+from utils import s
 
 
 def main(page: ft.Page):
-    page.title = 'Анализатор компьютера'
+    page.data = '[wintitle]'
     page.on_disconnect = lambda *a, **k: exit(0)
     page.window.height = 10
     page.window.width = 10
@@ -26,21 +27,27 @@ def main(page: ft.Page):
             ft.NavigationBarDestination(
                 icon=ft.Icons.TIMER_OUTLINED,
                 selected_icon=ft.Icons.TIMER,
-                label="Сейчас"
+                data='[navbar.now]'
             ),
             ft.NavigationBarDestination(
                 icon=ft.Icons.TIMELINE_OUTLINED,
                 selected_icon=ft.Icons.TIMELINE,
-                label="График"
+                data='[navbar.chart]'
             ),
             ft.NavigationBarDestination(
                 icon=ft.Icons.SETTINGS_OUTLINED,
                 selected_icon=ft.Icons.SETTINGS,
-                label="Настройки",
+                data='[navbar.settings]'
             ),
         ],
         on_change=change_destination
     )
+    s.translations += [
+        [page, 'title'],
+        [page.navigation_bar.destinations[0], 'label'],
+        [page.navigation_bar.destinations[1], 'label'],
+        [page.navigation_bar.destinations[2], 'label']
+    ]
     page.update()
     
     page_now(page)
