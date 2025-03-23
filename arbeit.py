@@ -6,7 +6,7 @@ import sqlite3
 import time
 import psutil
 from sklearn.preprocessing import Normalizer
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 def to_model(sp: np.ndarray):
     
@@ -56,24 +56,32 @@ def problem_one(sl, kr_temp):
     stolb_cpu_temp = stolb_cpu_temp[:-1, :]
     
     stolb_cpu_temp = np.vstack((np.array([0]), stolb_cpu_temp))
+
+    neue = np.hstack((sl, stolb_cpu_temp))
+
     
-    print(stolb_cpu_temp)
+    #Теперь пятый столбец - будущая температура (температура через секунду). 
+    # У последней (первой) строки её, конечно, нет
     
-    neue = sl + stolb_cpu_temp
-    print(sl)
-    print('-----------------------')
-    print(neue)
+    neue = neue[1:,:] #Удаление последней строки ввиду отсутствия информации будущей температуры на неё
+    
+    
+    print(neue.size)
+    pprint(neue)
+    
+    X = neue[:, :-1]
+    Y = neue[:,-1]
+    
+    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2,random_state=42)
+    
+    vanina_model = LinearRegression()
+    vanina_model.fit(x_train, y_train)
+    
+    predictions = vanina_model.predict(x_test)
+    print(predictions, y_test)
     
     #print(new_col)
-c = 0
-def summa(a, b, c):
-    def jora(a, b, c):
-        print(f'Vanya loh! {c}')
-        c += 1
-        return summa(a, b)
-    return jora(a, b)
- 
-print(summa(1, 2, c))           
+arbeit_model()
     
 #def problem_two(sl):  
 #arbeit_model()
