@@ -3,6 +3,6 @@ GPUtil
 setuptools
 flet
 ufpy
+matplotlib
 numpy
-pandas
-scikit-learn
+ujson
