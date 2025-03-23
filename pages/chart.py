@@ -3,8 +3,8 @@ import flet as ft
 from matplotlib.figure import Figure
 from matplotlib.pyplot import close as plt_close
 
-from analys import analys, read_last
-from utils import get_uptime_str, smooth_resize
+from analysis import analys, read_last
+from utils import get_uptime_str, smooth_resize, translate
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -34,17 +34,17 @@ def page_chart(page: ft.Page):
 
         fig, axs = plt.subplots(1, 1)
         
-        axs.plot(points[:, 0], points[:, 1], label='t процессора (°C)', color='yellow')
+        axs.plot(points[:, 0], points[:, 1], label=translate('[data.temp_cpu] (°C)'), color='yellow')
         axs.plot(points[:, 0], points[:, 2], color='red')
         if points[0, 3] != -1:
-            axs.plot(points[:, 0], points[:, 3], label='t видеокарты (°C)', color='green')
-        axs.plot(points[:, 0], points[:, 4], label='использование процессора (%)', color='orange')
+            axs.plot(points[:, 0], points[:, 3], label=translate('[data.temp_gpu] (°C)'), color='green')
+        axs.plot(points[:, 0], points[:, 4], label=translate('[data.cpu_usage] (%)'), color='orange')
         if points[0, 5] != -1:
-            axs.plot(points[:, 0], points[:, 5], label='использование видеокарты (%)', color='blue')
-        axs.plot(points[:, 0], points[:, 6], label='использование ОЗУ (%)', color='purple')
-        axs.legend()
+            axs.plot(points[:, 0], points[:, 5], label=translate('[data.gpu_usage] (%)'), color='blue')
+        axs.plot(points[:, 0], points[:, 6], label=translate('[data.ram_usage] (%)'), color='purple')
+        axs.legend(loc='upper left')
         axs.set_xlim(sut, ut)
-        axs.set_xlabel("время с момента включения компьютера")
+        axs.set_xlabel(translate("[chart.xaxis_title]"))
         axs.grid(True, color="white", linestyle="--", linewidth=0.5)
         axs.tick_params(colors="white", which="both")
         axs.xaxis.label.set_color("white")

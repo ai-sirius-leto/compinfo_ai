@@ -26,8 +26,10 @@ def page_settings(page: ft.Page):
         set_settings(sets)
         
         for p, n in s.translations:
-            p.__setattr__(n, translate(p.data))
-            p.update()
+            if p.data:
+                p.__setattr__(n, translate(p.data))
+            if p.page:
+                p.update()
         
         row.update()
     

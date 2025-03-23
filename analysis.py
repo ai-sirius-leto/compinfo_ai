@@ -1,5 +1,4 @@
 import sqlite3
-from typing import Any
 import psutil
 import time
 import GPUtil
