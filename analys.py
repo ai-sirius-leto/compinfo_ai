@@ -24,7 +24,11 @@ def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
 
 def read_last() -> tuple[int, float, float, float, float, float, float]:
     return read_all()[-1]
-        
+     
+class State:
+    gpu_not_exist_warn_showed = False
+s = State()
+
 def analys():
     # CPU temperature
     temperature = psutil.sensors_temperatures()
@@ -44,7 +48,9 @@ def analys():
         #Загрузка видеокарты
         gpu_usage = GPUtil.getGPUs()[0].load
     except IndexError:
-        print('Видеокарта не обнаружена')
+        if not s.gpu_not_exist_warn_showed:
+            print('Видеокарта не обнаружена')
+            s.gpu_not_exist_warn_showed = True
         temperature_gpu = -1
         gpu_usage = -1
 

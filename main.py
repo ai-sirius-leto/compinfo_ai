@@ -46,5 +46,5 @@ def main(page: ft.Page):
     page_now(page)
 
 if __name__ == '__main__':
-    ft.app(main, use_color_emoji=True)
+    ft.app(main, use_color_emoji=True, assets_dir="pages/assets")
 

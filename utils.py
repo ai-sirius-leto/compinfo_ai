@@ -1,3 +1,5 @@
+from ujson import dumps, loads
+from typing import Any
 import flet as ft
 
 def smooth_resize(page: ft.Page, nh: int, nw: int):
@@ -34,3 +36,14 @@ def get_uptime_str(uptime: int) -> str:
     uptime_l = [ut_d, ut_h, ut_min, ut_s]
     uptime_l2 = [str(i) for i in uptime_l if i > 0]
     return ':'.join(uptime_l2)
+
+settings_path = 'pages/settings.json'
+
+def get_settings() -> dict[str, Any]:
+    with open(settings_path) as f:
+        d = f.read()
+    return loads(d)
+
+def set_settings(new_data: dict[str, Any]) -> None:
+    with open(settings_path, "w") as f:
+        f.write(dumps(new_data, indent=4))

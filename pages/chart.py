@@ -63,10 +63,13 @@ def page_chart(page: ft.Page):
     
     def update_chart():
         while page.navigation_bar.selected_index == 1:
-            fig = chart.figure
-            chart.figure = __get_plot()
-            chart.update()
-            plt_close(fig)
+            try:
+                fig = chart.figure
+                chart.figure = __get_plot()
+                chart.update()
+                plt_close(fig)
+            except AssertionError:
+                return
 
     page.add(chart)
     update_chart()
