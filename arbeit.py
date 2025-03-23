@@ -39,18 +39,16 @@ def arbeit_model():
     # Uptime - Temp_CPU - CPU_usage - RAM_usage 
     
     if not flag_give_gpu:
-        problem_one(sl, kritical_temperature_cpu)
+        predict_temp_cpu_if_not_gpu(sl, kritical_temperature_cpu)
     #else:
     #    problem_two(sl, kritical_temperature_cpu)
     # Таблица с GPU После изменений имеет вид:
     
     # Uptime - Temp_CPU - Temp_GPU - CPU_usage - GPU_usage - RAM_usage 
     
-def problem_one(sl, kr_temp):
+def predict_temp_cpu_if_not_gpu(sl: np.ndarray) -> np.ndaraay:
     # Вид numpy-массива sl: Uptime - Temp_CPU - CPU_usage - RAM_usage 
     # kr_temp - критическая температура CPU
-    
-    
     stolb_cpu_temp = sl[:, 1:2]
     
     stolb_cpu_temp = stolb_cpu_temp[:-1, :]
@@ -62,13 +60,12 @@ def problem_one(sl, kr_temp):
     
     #Теперь пятый столбец - будущая температура (температура через секунду). 
     # У последней (первой) строки её, конечно, нет
-    
     neue = neue[1:,:] #Удаление последней строки ввиду отсутствия информации будущей температуры на неё
     
-    
-    print(neue.size)
-    pprint(neue)
-    
+    #С этого момента в массиве neue хранится текущая информация и будущая информация по температуре процессора в следующей строке  
+    # По факту вид: Uptime - Temp_CPU - CPU_usage - RAM_usage - Temp_CPU_future
+
+
     X = neue[:, :-1]
     Y = neue[:,-1]
     
@@ -78,9 +75,13 @@ def problem_one(sl, kr_temp):
     vanina_model.fit(x_train, y_train)
     
     predictions = vanina_model.predict(x_test)
-    print(predictions, y_test)
+
     
-    #print(new_col)
+
+    print(y_test)
+    print(predictions)
+
+
 arbeit_model()
     
 #def problem_two(sl):  
