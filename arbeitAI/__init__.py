@@ -1,3 +1,4 @@
+from arbeitAI.predict import predict
 from arbeitAI.utils import to_model
 from arbeitAI.temp_cpu import learn_model_temp_cpu_if_not_gpu, predict_temp_cpu_if_not_gpu
 from arbeitAI.usage_cpu import learn_model_cpu_usage_if_not_gpu, predict_usage_cpu_if_not_gpu

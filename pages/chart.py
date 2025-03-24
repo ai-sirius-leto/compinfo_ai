@@ -1,9 +1,15 @@
+from math import nan
+from re import S
 from sqlite3 import connect
 import flet as ft
 from matplotlib.figure import Figure
 from matplotlib.pyplot import close as plt_close
 
 from analysis import analys, read_last
+from arbeitAI.predict import predict
+from arbeitAI.ram_usage import predict_ram_if_not_gpu
+from arbeitAI.temp_cpu import predict_temp_cpu_if_not_gpu
+from arbeitAI.usage_cpu import predict_usage_cpu_if_not_gpu
 from utils import get_uptime_str, smooth_resize, translate
 
 import matplotlib
@@ -22,7 +28,10 @@ def page_chart(page: ft.Page):
     def __get_plot() -> Figure:
         analys()
         ut = read_last()[0]
-        sut = ut - 120000
+        sut = ut - 60000
+        
+        predict_ms = 1000 * 30
+        predict_ut = ut
         
         with connect('data.db') as conn:
             cur = conn.cursor()
@@ -30,20 +39,54 @@ def page_chart(page: ft.Page):
             r = cur.fetchall()
             cur.close()
         
+        # points = np.array(sorted(r, key=lambda x: x[0]) + [[ut + 1000] + [np.nan] * 6])
         points = np.array(sorted(r, key=lambda x: x[0]))
+        # predicted_points = np.array([[ut] + [np.nan] * 6])
+        predicted_points = np.array([])
 
-        fig, axs = plt.subplots(1, 1)
+        fig, axs = plt.subplots()
         
-        axs.plot(points[:, 0], points[:, 1], label=translate('[data.temp_cpu] (°C)'), color='yellow')
-        axs.plot(points[:, 0], points[:, 2], color='red')
+        # Predict `predict_ms` milliseconds
+        for i in range(1, (predict_ms // 1000) + 1):
+            predicted = predict(points, ut+i*1000)
+            if predicted_points.size == 0:
+                predicted_points = np.array(predicted)
+            else:
+                predicted_points = np.vstack((predicted_points, predicted))
+
+        def get_x_y(x_arr_column, y_arr_column, start, end):
+            m = (x_arr_column >= start) & (x_arr_column <= end)
+            return x_arr_column[m], y_arr_column[m]
+
+        # Temp cpu (real / predicted)
+        axs.plot(*get_x_y(points[:, 0], points[:, 1], sut, ut), label=translate('[data.temp_cpu] (°C)'), color='yellow')
+        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 1], ut - 1000, ut + predict_ms), color=(1, 1, 0.458823529))
+
+        axs.plot(points[:, 0], points[:, 2], color='red') # Critical temp cpu
+        
+        # Temp gpu (if exist)
         if points[0, 3] != -1:
             axs.plot(points[:, 0], points[:, 3], label=translate('[data.temp_gpu] (°C)'), color='green')
-        axs.plot(points[:, 0], points[:, 4], label=translate('[data.cpu_usage] (%)'), color='orange')
+        
+        # Cpu usage (real / predicted)
+        axs.plot(*get_x_y(points[:, 0], points[:, 4], sut, ut), label=translate('[data.cpu_usage] (%)'), color='orange')
+        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 2], ut - 1000, ut + predict_ms), color=(1, 0.811764706, 0.509803922))
+        
+        
+        # Gpu usage (if exist)
         if points[0, 5] != -1:
             axs.plot(points[:, 0], points[:, 5], label=translate('[data.gpu_usage] (%)'), color='blue')
-        axs.plot(points[:, 0], points[:, 6], label=translate('[data.ram_usage] (%)'), color='purple')
+        
+        # Ram usage (real / predicted)
+        axs.plot(*get_x_y(points[:, 0], points[:, 6], sut, ut), label=translate('[data.ram_usage] (%)'), color='purple')
+        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 3], ut - 1000, ut + predict_ms), color=(1, 0.490196078, 1))
+        
+        # Line which's dividing real an predicted data
+        axs.plot([ut] * 100, np.arange(100), color='grey')
+        
+        # Settings
         axs.legend(loc='upper left')
-        axs.set_xlim(sut, ut)
+        axs.set_xlim(sut, ut + predict_ms)
         axs.set_xlabel(translate("[chart.xaxis_title]"))
         axs.grid(True, color="white", linestyle="--", linewidth=0.5)
         axs.tick_params(colors="white", which="both")
