@@ -6,3 +6,4 @@ ufpy
 matplotlib
 numpy
 ujson
+scikit-learn
