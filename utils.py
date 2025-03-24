@@ -95,7 +95,8 @@ class _translations(list):
     
     def append(self, object):
         p, n = object
-        p.__setattr__(n, translate(p.data))
+        if p.data:
+            p.__setattr__(n, translate(p.data))
         return super().append(object)
     
     def __iadd__(self, value):
