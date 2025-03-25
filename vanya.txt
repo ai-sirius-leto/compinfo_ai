@@ -1,0 +1,27 @@
+import numpy as np
+from sklearn.linear_model import LinearRegression
+def modelka(X: np.ndarray, Y: np.ndarray):
+    '''
+    Функия обучает текущую модель. Х - данные, У - то, что должно предсказаться 
+    (Иными словами У - данные, которые должны предсказаться)
+    
+    Массив Х - numpy-array, представляющий собой двумерную матрицу
+    Вид массива X (зависит от наличия GPU у пользователя:
+    
+    Uptime - temp_cpu - temp_gpu - cpu_usage - gpu_usage - ram_usage
+    
+    Uptime - temp_cpu - cpu_usage - ram_usage
+    
+    uptime - Время с момента включения
+    temp_cpu - температура CPU
+    temp_gpu - температура GPU (Если есть)
+    cpu_usage - Использование CPU
+    gpu_usage - Использование GPU (Если есть)
+    ram_usage - Использование ОЗУ
+    )
+    
+    Массив Y - тоже numpy-array, тоже двумерный массив, но имеющий 1 столбец
+    '''
+    
+    
+    return LinearRegression().fit(X, Y.ravel())

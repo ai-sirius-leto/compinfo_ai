@@ -1,6 +1,6 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression 
-from arbeitAI.utils import to_model
+
+from arbeitAI.model import modelka
 def learn_model_cpu_usage_if_not_gpu(sl:np.ndarray): #Функция возвращает обученную модель
     """На вход подаётся нумпи массив данных, на основе которых будет учиться модель"""
     # Вид numpy-массива sl: Uptime - Temp_CPU - CPU_usage - RAM_usage 
@@ -19,12 +19,36 @@ def learn_model_cpu_usage_if_not_gpu(sl:np.ndarray): #Функция возвр�
     X = neue[:, :-1]
     Y = neue[:, -1:]
     
-    vanina_model = LinearRegression().fit(X, Y)
-    return vanina_model
+  
+    return modelka(X, Y)
     
 def predict_usage_cpu_if_not_gpu(sl: np.ndarray):
     model = learn_model_cpu_usage_if_not_gpu(sl)
     
     future = sl[-1:,:]
     return model.predict(future)
+
+def learn_model_cpu_usage_if_gpu(sl:np.ndarray):
+    """
+    Вид массива sl:  Uptime - temp_cpu - temp_gpu - cpu_usage - gpu_usage - ram_usage
+    """
     
+    stolb_cpu_usage_future = sl[:, 3:4]
+    stolb_cpu_usage_future = stolb_cpu_usage_future[1:, :]
+    stolb_cpu_usage_future = np.vstack((stolb_cpu_usage_future, np.array([0])))
+    
+    neue = np.hstack((sl, stolb_cpu_usage_future))
+    
+    neue = neue[:-1, :]
+    
+    X = neue[:,:-1]
+    Y = neue[:,-1:]
+    
+    return modelka(X, Y)
+
+def predict_usage_cpu_if_gpu(sl: np.ndarray):
+    
+    modelio = learn_model_cpu_usage_if_gpu(sl)
+    future = sl[-1:,:]
+    
+    return modelio.predict(future)

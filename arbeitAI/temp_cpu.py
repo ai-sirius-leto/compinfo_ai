@@ -1,6 +1,7 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from arbeitAI.utils import to_model
+
+
+from arbeitAI.model import modelka
 def learn_model_temp_cpu_if_not_gpu(sl: np.ndarray): #Функция возвращает обученную модель
     
     """На вход подаётся нумпи массив данных, на основе которых будет учиться модель"""
@@ -29,9 +30,7 @@ def learn_model_temp_cpu_if_not_gpu(sl: np.ndarray): #Функция возвр�
     X = neue[:, :-1]
     Y = neue[:,-1]
     
-    vanina_model = LinearRegression()
-    vanina_model.fit(X, Y)
-    return vanina_model
+    return modelka(X, Y)
 def predict_temp_cpu_if_not_gpu(sl: np.ndarray) -> np.ndarray: #Функция обучает модель и возвращает температуру CPU в будущую секунду
     # Вид numpy-массива sl: Uptime - Temp_CPU - CPU_usage - RAM_usage 
     # kr_temp - критическая температура CPU
@@ -40,3 +39,24 @@ def predict_temp_cpu_if_not_gpu(sl: np.ndarray) -> np.ndarray: #Функция �
     future = sl[-1:,:]
 
     return model.predict(future)
+
+def learn_model_temp_cpu_if_gpu(sl: np.ndarray):
+    """
+    Вид массива sl:  Uptime - temp_cpu - temp_gpu - cpu_usage - gpu_usage - ram_usage
+    """
+    noka = sl[:,1:2]
+    print(noka)
+    
+    noka = noka[1:,:]
+    noka = np.vstack((noka, np.array([0])))
+    
+    neue = np.hstack((sl, noka))
+    neue = neue[:-1,:]
+    
+    X = neue[:,:-1]
+    Y = neue[:,-1:]
+    return modelka(X, Y)
+def predict_temp_cpu_if_gpu(sl: np.ndarray):
+    tolya = learn_model_temp_cpu_if_gpu(sl)
+    future = sl[-1:,:]
+    return tolya.predict(future)
