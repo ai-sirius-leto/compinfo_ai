@@ -1,11 +1,10 @@
-from math import nan
-from re import S
+from os import read
 from sqlite3 import connect
 import flet as ft
 from matplotlib.figure import Figure
 from matplotlib.pyplot import close as plt_close
 
-from analysis import analys, read_last
+from analysis import analysis, read_all, read_last
 from arbeitAI.predict import predict
 from arbeitAI.ram_usage import predict_ram_if_not_gpu
 from arbeitAI.temp_cpu import predict_temp_cpu_if_not_gpu
@@ -26,22 +25,16 @@ def page_chart(page: ft.Page):
     
     
     def __get_plot() -> Figure:
-        analys()
+        analysis()
         ut = read_last()[0]
         sut = ut - 60000
         
         predict_ms = 1000 * 30
         predict_ut = ut
+
+        r = [i for i in read_all() if i[0] > sut]
         
-        with connect('data.db') as conn:
-            cur = conn.cursor()
-            cur.execute('select * from compinfo where uptime > ?', (sut,))
-            r = cur.fetchall()
-            cur.close()
-        
-        # points = np.array(sorted(r, key=lambda x: x[0]) + [[ut + 1000] + [np.nan] * 6])
         points = np.array(sorted(r, key=lambda x: x[0]))
-        # predicted_points = np.array([[ut] + [np.nan] * 6])
         predicted_points = np.array([])
 
         fig, axs = plt.subplots()
@@ -78,7 +71,7 @@ def page_chart(page: ft.Page):
             axs.plot(points[:, 0], points[:, 5], label=translate('[data.gpu_usage] (%)'), color='blue')
         
         # Ram usage (real / predicted)
-        axs.plot(*get_x_y(points[:, 0], points[:, 6], sut, ut), label=translate('[data.ram_usage] (%)'), color='purple')
+        axs.plot(*get_x_y(points[:, 0], points[:, 6], sut, ut), label=translate('[data.ram_usage] (%)'), color=(1, 0, 1))
         axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 3], ut - 1000, ut + predict_ms), color=(1, 0.490196078, 1))
         
         # Line which's dividing real an predicted data

@@ -1,69 +1,74 @@
-import sqlite3
 import psutil
 import time
 import GPUtil
+import pandas as pd
 
-conn = sqlite3.connect('data.db')
-conn.execute('CREATE TABLE IF NOT EXISTS compinfo (uptime int, temp_cpu float, crit_temp_cpu float, temp_gpu float, cpu_usage float, gpu_usage float, ram_usage float)')
-conn.commit()
-conn.close()
+# Create dataframe if not exist
+try:
+    pd.read_csv('data.csv')
+except pd.errors.EmptyDataError:
+    df = pd.DataFrame({
+        'uptime': [],
+        'temp_cpu': [],
+        'crit_temp_cpu': [],
+        'temp_gpu': [],
+        'cpu_usage': [],
+        'gpu_usage': [],
+        'ram_usage': []
+    })
+    df.to_csv('data.csv', index=False)
 
 def write(uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_usage):
-    with sqlite3.connect('data.db') as conn:
-        conn.execute('INSERT INTO compinfo VALUES (?, ?, ?, ?, ?, ?, ?)', (uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_usage))
-        conn.commit()
+    df = pd.read_csv('data.csv')
+    df.loc[len(df)] = {
+        'uptime': uptime,
+        'temp_cpu': temp_cpu,
+        'crit_temp_cpu': crit_temp_cpu,
+        'temp_gpu': temp_gpu,
+        'cpu_usage': cpu_usage,
+        'gpu_usage': gpu_usage,
+        'ram_usage': ram_usage
+    }
+    df.to_csv('data.csv', index=False)
 
 def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
-    with sqlite3.connect('data.db') as conn:
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM compinfo')
-        r = cur.fetchall()
-        cur.close()
-    return r
+    df = pd.read_csv('data.csv')
+    return [list(df.loc[i]) for i in range(len(df))]
 
 def read_last() -> tuple[int, float, float, float, float, float, float]:
-    return read_all()[-1]
+    df = pd.read_csv('data.csv')
+    return tuple(df.loc[len(df)-1]) # get last series
      
 class State:
     gpu_not_exist_warn_showed = False
 s = State()
 
-def analys():
-    # CPU temperature
-    temperature = psutil.sensors_temperatures()
+def analysis():
+    uptime = int((time.time() - psutil.boot_time()) * 10**3)
+    sensors_temps = psutil.sensors_temperatures()
 
-    curr = [i.current for i in temperature['coretemp']]
-    crit = [i.critical for i in temperature['coretemp']]
+    curr = [i.current for i in sensors_temps['coretemp']]
+    crit = [i.critical for i in sensors_temps['coretemp']]
     
     # Average CPU temperature
-    avg_curr = sum(curr) / len(curr)
+    cpu_temp = sum(curr) / len(curr)
     avg_crit = sum(crit) / len(crit)
     
-    temperature_cpu = avg_curr
-    
     try:
-        #Температура видеокарты
-        temperature_gpu = GPUtil.getGPUs()[0].temperature
-        #Загрузка видеокарты
+        gpu_temp = GPUtil.getGPUs()[0].temperature
         gpu_usage = GPUtil.getGPUs()[0].load
     except IndexError:
         if not s.gpu_not_exist_warn_showed:
-            print('Видеокарта не обнаружена')
+            print('[WARN] GPU is missing')
             s.gpu_not_exist_warn_showed = True
-        temperature_gpu = -1
+        gpu_temp = -1
         gpu_usage = -1
 
 
-    #Загрузка процессора
-    processor_usage = psutil.cpu_percent(interval=1)
-    
-    #Текущее время работы
-    uptime = int((time.time() - psutil.boot_time()) * 10**3)
-    
-    #Загруженность диска и ОЗУ
+    cpu_usage = psutil.cpu_percent(interval=1)
     ram_usage = psutil.virtual_memory().percent
  
-    write(uptime, temperature_cpu, avg_crit, temperature_gpu, processor_usage, gpu_usage, ram_usage)
+    write(uptime, cpu_temp, avg_crit, gpu_temp, cpu_usage, gpu_usage, ram_usage)
 
 if __name__ == '__main__':
-    analys()
+    analysis()
