@@ -1,3 +1,4 @@
+from analysis import read_all, read_last
 from arbeitAI import predict_temp_cpu_if_not_gpu, predict_usage_cpu_if_not_gpu, predict_ram_if_not_gpu, predict_usage_cpu_if_gpu, predict_ram_if_gpu, predict_temp_gpu, predict_temp_cpu_if_gpu, predict_usage_gpu
 import sqlite3
 import numpy as np
@@ -7,18 +8,7 @@ from arbeitAI.temp_cpu import learn_model_temp_cpu_if_gpu
 from arbeitAI.usage_cpu import learn_model_cpu_usage_if_gpu
 from arbeitAI.utils import to_model
 def arbeit_model():
-    with sqlite3.connect('data.db') as conn:
-        cur = conn.cursor()
-        cur.execute("select * from compinfo")
-        f = cur.fetchall()
-        
-        try:
-            r = f[::-1][:120][::-1]
-        except IndexError:
-            r = f
-        cur.close()
-    
-    sl = np.array(r)
+    sl = np.array(read_all())
 
 
     kritical_temperature_cpu = sl[1, 2]
@@ -69,26 +59,5 @@ def all_predicter_if_gpu(sl):
     print(predict_ram_if_gpu(sl))
     print(predict_usage_gpu(sl))
     print(predict_temp_gpu(sl))
-    
-        
-    
-    
-    
-    
-    
-def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
-    with sqlite3.connect('data.db') as conn:
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM compinfo')
-        r = cur.fetchall()
-        cur.close()
-    return r
-
-def read_last() -> tuple[int, float, float, float, float, float, float]:
-    return read_all()[-1]
-    
-    
-    
-    
     
 arbeit_model()

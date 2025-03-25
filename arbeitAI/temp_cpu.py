@@ -45,7 +45,7 @@ def learn_model_temp_cpu_if_gpu(sl: np.ndarray):
     Вид массива sl:  Uptime - temp_cpu - temp_gpu - cpu_usage - gpu_usage - ram_usage
     """
     noka = sl[:,1:2]
-    print(noka)
+
     
     noka = noka[1:,:]
     noka = np.vstack((noka, np.array([0])))
