@@ -1,5 +1,5 @@
 import numpy as np
-
+from sklearn.linear_model import LinearRegression
 from arbeitAI.model import modelka
 def learn_model_cpu_usage_if_not_gpu(sl:np.ndarray): #Функция возвращает обученную модель
     """На вход подаётся нумпи массив данных, на основе которых будет учиться модель"""
@@ -19,6 +19,12 @@ def learn_model_cpu_usage_if_not_gpu(sl:np.ndarray): #Функция возвр�
     X = neue[:, :-1]
     Y = neue[:, -1:]
     
+    model = LinearRegression().fit(X, Y)
+    return model
+    
+    
+    print(X)
+    print(Y)
   
     return modelka(X, Y)
     
