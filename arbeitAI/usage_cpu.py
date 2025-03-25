@@ -9,7 +9,7 @@ def learn_model_cpu_usage_if_not_gpu(sl:np.ndarray): #Функция возвр�
     stolb_cpu_temp = sl[:, 2:3]
     
     stolb_cpu_temp = stolb_cpu_temp[1:, :]
-    stolb_cpu_temp = np.append(stolb_cpu_temp, np.array([[0]]), axis = 0)
+    stolb_cpu_temp = np.vstack((stolb_cpu_temp, np.array([0])))
     
     
     neue = np.hstack((sl, stolb_cpu_temp))
