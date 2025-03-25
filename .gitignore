@@ -172,3 +172,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# JS
+node_modules/
+
+# VsCode
+.vscode/
+
+# Results
+cpu_temp.res

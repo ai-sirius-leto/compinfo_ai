@@ -1,9 +1,5 @@
-from enum import auto
-from threading import Thread
-import time
-from numpy import isin, var
 from ujson import dumps, loads
-from typing import Any, ChainMap, Iterable, Optional
+from typing import Any
 import flet as ft
 
 
@@ -45,12 +41,12 @@ def get_uptime_str(uptime: int) -> str:
 settings_path = 'pages/settings.json'
 
 def get_settings() -> dict[str, Any]:
-    with open(settings_path) as f:
+    with open(settings_path, encoding='utf8') as f:
         d = f.read()
     return loads(d)
 
 def set_settings(new_data: dict[str, Any]) -> None:
-    with open(settings_path, "w") as f:
+    with open(settings_path, "w", encoding='utf8') as f:
         f.write(dumps(new_data, indent=4))
         
 loc_files = {
@@ -112,9 +108,9 @@ s = State()
 def translate(s: str) -> None:
     curr_lang = get_settings()['lang']
     
-    with open(loc_files[curr_lang]) as f:
+    with open(loc_files[curr_lang], encoding='utf8') as f:
         loc = __get_onedim_dict(loads(f.read()))
-    with open(loc_files[list(loc_files.keys())[0]]) as f:
+    with open(loc_files[list(loc_files.keys())[0]], encoding='utf8') as f:
         def_loc = __get_onedim_dict(loads(f.read()))
     
     for k, v in loc.items():

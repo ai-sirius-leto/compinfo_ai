@@ -2,6 +2,7 @@ import psutil
 import time
 import GPUtil
 import pandas as pd
+import os
 
 # Create dataframe if not exist
 try:
@@ -43,16 +44,43 @@ class State:
     gpu_not_exist_warn_showed = False
 s = State()
 
+def get_cpu_temp_js() -> float:
+    if os.name == 'nt': # If windows
+        command = "node cpu_temp.js"
+        import ctypes
+        try:
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", "cmd.exe", f"/c -WindowStyle Hidden {command}", None, 1
+            )
+        except Exception as e:
+            print("Ошибка:", e)
+    else:
+        os.system("sudo node cpu_temp.js")
+    # time.sleep(1)
+    
+    import ujson
+    
+    with open('cpu_temp.res', encoding='utf8') as f:
+        r = f.read()
+    # os.remove('cpu_temp.res')
+    return float(r)
+
 def analysis():
     uptime = int((time.time() - psutil.boot_time()) * 10**3)
-    sensors_temps = psutil.sensors_temperatures()
 
-    curr = [i.current for i in sensors_temps['coretemp']]
-    crit = [i.critical for i in sensors_temps['coretemp']]
-    
-    # Average CPU temperature
-    cpu_temp = sum(curr) / len(curr)
-    avg_crit = sum(crit) / len(crit)
+    if os.name == 'nt':
+        # Windows
+        cpu_temp = get_cpu_temp_js()
+        avg_crit = 100
+    else:
+        # Other (Linux + MacOs)
+        sensors_temps = psutil.sensors_temperatures()
+        
+        curr = [i.current for i in sensors_temps['coretemp']]
+        crit = [i.critical for i in sensors_temps['coretemp']]
+        
+        cpu_temp = sum(curr) / len(curr)
+        avg_crit = sum(crit) / len(crit)
     
     try:
         gpu_temp = GPUtil.getGPUs()[0].temperature
