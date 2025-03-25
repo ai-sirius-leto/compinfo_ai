@@ -1,5 +1,5 @@
 import flet as ft
-from analysis import analys, read_all, read_last
+from analysis import analysis, read_all, read_last
 from utils import get_uptime_str, smooth_resize, s
 
 class _TranslatedFStr:
@@ -52,7 +52,7 @@ def page_now(page: ft.Page):
     def update_txt():
         while page.navigation_bar.selected_index == 0:
             try:
-                analys()
+                analysis()
                 
                 txt.value = format_data(read_last())
                 
