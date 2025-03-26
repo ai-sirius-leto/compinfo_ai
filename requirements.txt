@@ -8,3 +8,4 @@ numpy
 ujson
 scikit-learn
 pandas
+pynput

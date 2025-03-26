@@ -3,6 +3,8 @@ from sqlite3 import connect
 import flet as ft
 from matplotlib.figure import Figure
 from matplotlib.pyplot import close as plt_close
+import psutil
+import time
 
 from analysis import analysis, read_all, read_last
 from arbeitAI.predict import predict
@@ -27,7 +29,12 @@ def page_chart(page: ft.Page):
     def __get_plot() -> Figure:
         analysis()
         ut = read_last()[0]
-        sut = ut - 60000
+        
+        p = psutil.Process()
+        
+        sut = max((psutil.boot_time() - p.create_time()) * 1000, ut - 60000)
+        
+        # sut = ut - 60000
         
         predict_ms = 1000 * 30
         predict_ut = ut
@@ -63,7 +70,7 @@ def page_chart(page: ft.Page):
         
         # Cpu usage (real / predicted)
         axs.plot(*get_x_y(points[:, 0], points[:, 4], sut, ut), label=translate('[data.cpu_usage] (%)'), color='orange')
-        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 2], ut - 1000, ut + predict_ms), color=(1, 0.811764706, 0.509803922))
+        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 4], ut - 1000, ut + predict_ms), color=(1, 0.811764706, 0.509803922))
         
         
         # Gpu usage (if exist)
@@ -72,7 +79,7 @@ def page_chart(page: ft.Page):
         
         # Ram usage (real / predicted)
         axs.plot(*get_x_y(points[:, 0], points[:, 6], sut, ut), label=translate('[data.ram_usage] (%)'), color=(1, 0, 1))
-        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 3], ut - 1000, ut + predict_ms), color=(1, 0.490196078, 1))
+        axs.plot(*get_x_y(predicted_points[:, 0], predicted_points[:, 6], ut - 1000, ut + predict_ms), color=(1, 0.490196078, 1))
         
         # Line which's dividing real an predicted data
         axs.plot([ut] * 100, np.arange(100), color='grey')

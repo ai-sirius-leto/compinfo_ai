@@ -3,7 +3,7 @@ import flet as ft
 from pages.chart import page_chart
 from pages.now import page_now
 from pages.settings import page_settings
-from utils import s
+from utils import get_settings, s
 
 
 def main(page: ft.Page):
@@ -11,6 +11,16 @@ def main(page: ft.Page):
     page.on_disconnect = lambda *a, **k: exit(0)
     page.window.height = 10
     page.window.width = 10
+    page.on_close = exit
+    
+    sets = get_settings()
+    match sets['theme']:
+        case 'light':
+            page.theme_mode = ft.ThemeMode.LIGHT
+        case 'system':
+            page.theme_mode = ft.ThemeMode.SYSTEM
+        case 'dark':
+            page.theme_mode = ft.ThemeMode.DARK
     
     def change_destination(*_):
         page.controls.clear()

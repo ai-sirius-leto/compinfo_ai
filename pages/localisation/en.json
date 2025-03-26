@@ -23,6 +23,8 @@
     },
     "settings": {
         "title": "Settings",
-        "lang": "Language"
+        "lang": "Language",
+        "theme": "Theme",
+        "theme_tip": "Tip: Use Shift key to change themes in reverse order"
     }
 }
