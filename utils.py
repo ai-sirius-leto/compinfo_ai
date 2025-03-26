@@ -24,6 +24,7 @@ def smooth_resize(page: ft.Page, nh: int, nw: int):
     page.update()
 
 def get_uptime_str(uptime: int) -> str:
+    uptime = int(uptime)
     ut_ms = uptime % 1000
     uptime //= 1000
     ut_s = uptime % 60
@@ -34,8 +35,17 @@ def get_uptime_str(uptime: int) -> str:
     uptime //= 24
     ut_d = uptime
     
-    uptime_l = [ut_d, ut_h, ut_min, ut_s]
-    uptime_l2 = [str(i) for i in uptime_l if i > 0]
+    def __format_num(x):
+        x = str(x)
+        return "0" * (2 - len(x)) + x
+
+    uptime_l = map(__format_num, [ut_d, ut_h, ut_min, ut_s])
+    uptime_l2 = []
+
+    for i in uptime_l:
+        if i != "00" or len(uptime_l2) > 0:
+            uptime_l2.append(i)
+
     return ':'.join(uptime_l2)
 
 settings_path = 'pages/settings.json'
