@@ -11,7 +11,7 @@ from arbeitAI.predict import predict
 from arbeitAI.ram_usage import predict_ram_if_not_gpu
 from arbeitAI.temp_cpu import predict_temp_cpu_if_not_gpu
 from arbeitAI.usage_cpu import predict_usage_cpu_if_not_gpu
-from utils import get_uptime_str, smooth_resize, translate
+from utils import get_settings, get_uptime_str, smooth_resize, translate
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -36,7 +36,8 @@ def page_chart(page: ft.Page):
         
         # sut = ut - 60000
         
-        predict_ms = 1000 * 30
+        sets = get_settings()
+        predict_ms = 1000 * sets['pr_sc']
         predict_ut = ut
 
         r = [i for i in read_all() if i[0] > sut]

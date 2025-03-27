@@ -11,7 +11,7 @@ s2 = State()
 def page_settings(page: ft.Page):
     page.update()
     
-    smooth_resize(page, 350, 300)
+    smooth_resize(page, 430, 300)
     sets = get_settings()
     curr_lang = sets['lang']
     curr_theme = sets['theme']
@@ -25,6 +25,12 @@ def page_settings(page: ft.Page):
     dark_theme = ft.Image('/dark_theme.png', height=40, opacity=1 if curr_theme == 'dark' else 0.5)
     theme_row = ft.Row([light_theme, system_theme, dark_theme], width=145, height=50)
     
+    def change_pr_sc(*_):
+        sets = get_settings()
+        sets['pr_sc'] = round(pr_sc_slider.value)
+        set_settings(sets)
+
+    pr_sc_slider = ft.Slider(min=1, max=60, divisions=59, value=sets['pr_sc'], data='{value} [settings.pr_sc.slider.label]', on_change_end=change_pr_sc)
     
     def change_lang(*_):
         sets = get_settings()
@@ -77,23 +83,29 @@ def page_settings(page: ft.Page):
                 page.theme_mode = ft.ThemeMode.DARK
         page.update()
         
-        
     title = ft.Container(ft.Text(data='[settings.title]', size=30, weight=ft.FontWeight.BOLD), width=page.window.width, alignment=ft.Alignment(0, 0), padding=ft.Padding(0, 0, 0, 20))
     lang_setting = ft.Row([ft.Text(data='[settings.lang]', size=20, height=30), ft.FilledTonalButton(content=lang_row, on_click=change_lang)], alignment=ft.MainAxisAlignment.SPACE_AROUND)
     theme_setting = ft.Row([ft.Text(data='[settings.theme]', size=20, height=30), ft.FilledTonalButton(content=theme_row, on_click=change_theme)], alignment=ft.MainAxisAlignment.SPACE_AROUND)
     theme_tip = ft.Text(data='[settings.theme_tip]', opacity=0.5, size=12)
+
+    pr_sc_setting = ft.Column([ft.Text(data='[settings.pr_sc.text]', size=20, height=30, width=300, text_align=ft.TextAlign.CENTER), pr_sc_slider], alignment=ft.MainAxisAlignment.SPACE_AROUND)
+
+
     s.translations += [
         [title.content, 'value'],
         [lang_setting.controls[0], 'value'],
         [theme_setting.controls[0], 'value'],
-        [theme_tip, 'value']
+        [theme_tip, 'value'],
+        [pr_sc_slider, 'label'],
+        [pr_sc_setting.controls[0], 'value']
     ]
     
     page.add(
         title,
         lang_setting,
         theme_setting,
-        theme_tip
+        theme_tip,
+        pr_sc_setting
     )
     
     def on_press(key: Key | KeyCode):
