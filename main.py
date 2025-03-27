@@ -12,6 +12,19 @@ def main(page: ft.Page):
     page.window.height = 10
     page.window.width = 10
     page.on_close = lambda *_: exit(0)
+
+    def on_keyboard(e: ft.KeyboardEvent):
+        # Change navigation bar destinations using 'Arrow Left' and 'Arrow Right' keys
+        dests = list(range(len(page.navigation_bar.destinations))) * 3
+        curr_dest_index = 3 + page.navigation_bar.selected_index
+        match e.key:
+            case 'Arrow Left':
+                page.navigation_bar.selected_index = dests[curr_dest_index - 1]
+            case 'Arrow Right':
+                page.navigation_bar.selected_index = dests[curr_dest_index + 1]
+        change_destination()
+
+    page.on_keyboard_event = on_keyboard
     
     sets = get_settings()
     match sets['theme']:

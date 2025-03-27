@@ -30,15 +30,11 @@ def page_chart(page: ft.Page):
         analysis()
         ut = read_last()[0]
         
-        p = psutil.Process()
-        
+        p = psutil.Process()        
         sut = max((psutil.boot_time() - p.create_time()) * 1000, ut - 60000)
-        
-        # sut = ut - 60000
-        
+ 
         sets = get_settings()
         predict_ms = 1000 * sets['pr_sc']
-        predict_ut = ut
 
         r = [i for i in read_all() if i[0] > sut]
         
