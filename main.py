@@ -11,7 +11,7 @@ def main(page: ft.Page):
     page.on_disconnect = lambda *a, **k: exit(0)
     page.window.height = 10
     page.window.width = 10
-    page.on_close = exit
+    page.on_close = lambda *_: exit(0)
     
     sets = get_settings()
     match sets['theme']:

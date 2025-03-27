@@ -14,11 +14,11 @@ def modelka(X: np.ndarray, Y:np.ndarray):
     
     Y_predskaz = model.predict(X_test)
     
-    print("Коэффициент детерминации (R^2):", r2_score(Y_test, Y_predskaz))
+    # print("Коэффициент детерминации (R^2):", r2_score(Y_test, Y_predskaz))
     
     return model
     
-    
+
     
     
 def modelka_2(X: np.ndarray, Y: np.ndarray): #Обучает модель

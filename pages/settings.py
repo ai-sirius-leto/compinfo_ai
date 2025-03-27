@@ -1,4 +1,3 @@
-from os import close
 import flet as ft
 from utils import get_settings, set_settings, s, smooth_resize, translate
 from pynput import keyboard
@@ -53,7 +52,6 @@ def page_settings(page: ft.Page):
         lang_row.update()
     
     def change_theme(*_):
-        print(s2.shift)
         l = ['light', 'system', 'dark'] * 3
         sets = get_settings()
         curr_theme = sets['theme']
