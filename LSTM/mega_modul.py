@@ -67,14 +67,14 @@ def create_and_train_model(model_filename, scaler_filename, target_column, time_
             kernel_regularizer=l2(0.001)
         ),
         
-        Dropout(0.3),
+        Dropout(0.4),
         
         LSTM(
             64,
             return_sequences=False
         ),
         
-        Dropout(0.2),
+        Dropout(0.3),
         
         Dense(64, activation='relu'),
         Dense(32, activation='relu'),
@@ -204,20 +204,24 @@ def predict_future(target_column, model, scaler, initial_data, steps = 30, base_
     target_index = col_map[target_column]
     
     volatility_params = {
-        'temp_cpu':{'base':0.03, 'spike_prob':0.1, 'spike_mult':2.0},
-        'temp_gpu':{'base':0.03, 'spike_prob':0.07, 'spike_mult':1.8},
-        'cpu_usage':{'base':0.025, 'spike_prob':0.1, 'spike_mult':1.8},
-        'gpu_usage':{'base':0.03, 'spike_prob':0.12, 'spike_mult':2.0},
-        'ram_usage':{'base':0.001, 'spike_prob':0.002, 'spike_mult':1.0},
+        'temp_cpu': {'base': 0.01, 'spike_prob': 0.05, 'spike_mult': 1.5},
+        'temp_gpu': {'base': 0.01, 'spike_prob': 0.03, 'spike_mult': 1.3},
+        'cpu_usage': {'base': 0.01, 'spike_prob': 0.03, 'spike_mult': 1.2}, # Уменьшено
+        'gpu_usage': {'base': 0.015, 'spike_prob': 0.05, 'spike_mult': 1.3}, # Уменьшено
+        'ram_usage': {'base': 0.0005, 'spike_prob': 0.001, 'spike_mult': 1.0}
     }
     
     params = volatility_params[target_column]
     current_window = initial_data.copy()
     predictions = list()
     
+    #last_row = current_window[-1].copy()
+    #last_value = last_row[target_index]
+    
     for _ in range(steps):
         window_scaled = scaler.transform(current_window)
         pred_norm = model.predict(window_scaled[np.newaxis, :, :], verbose=0)[0][0]
+        
         
         noise = np.random.normal(scale=params['base'] * 0.5)
         
@@ -278,40 +282,70 @@ def all_model_remove():
         os.remove('LSTM/models/scalers/ram_usage_if_gpu_scaler.pkl')
     except:
         pass
-def all_predict(time_steps):
-    model, scaler, time_steps = load_saved_model('temp_cpu_if_gpu.h5', 'temp_cpu_if_gpu_scaler.pkl')
-    
+    try:
+        os.remove('LSTM/models/ram_usage_if_not_gpu.h5')
+        os.remove('LSTM/models/scalers/ram_usage_if_not_gpu_scaler.pkl')
+    except:
+        pass
+    try:
+        os.remove('LSTM/models/cpu_usage_if_not_gpu.h5')
+        os.remove('LSTM/models/scalers/cpu_usage_if_not_gpu_scaler.pkl')
+    except:
+        pass
+    try:
+        os.remove('LSTM/models/temp_cpu_if_not_gpu.h5')
+        os.remove('LSTM/models/scalers/temp_cpu_if_not_gpu_scaler.pkl')
+    except:
+        pass
+def all_predict(has_gpu, time_steps):
     n = pd.read_csv('data.csv')
-    
+        
     data = n.values[-30:, :]
-    
+        
     data = np.hstack((data[:, :2], data[:, 3:]))
+    if has_gpu:
+        model, scaler, time_steps = load_saved_model('temp_cpu_if_gpu.h5', 'temp_cpu_if_gpu_scaler.pkl')
     
-    
-    future_temp_cpu = predict_future('temp_cpu', model, scaler, data, time_steps).reshape(-1,1)
-    
-    model, scaler, time_steps = load_saved_model('cpu_usage_if_gpu.h5', 'cpu_usage_if_gpu_scaler.pkl')
-    
-    future_cpu_usage = predict_future('cpu_usage', model, scaler, data, time_steps).reshape(-1,1)
-    
-    model,scaler, time_steps = load_saved_model('temp_gpu.h5', 'temp_gpu_scaler.pkl')
-    
-    future_temp_gpu = predict_future('temp_gpu', model, scaler, data, time_steps).reshape(-1,1)
-    
-    model,scaler, time_steps = load_saved_model('gpu_usage.h5', 'gpu_usage_scaler.pkl')
-    
-    future_gpu_usage = predict_future('gpu_usage', model, scaler, data, time_steps).reshape(-1,1)
-    
-    model,scaler, time_steps = load_saved_model('ram_usage_if_gpu.h5', 'ram_usage_if_gpu_scaler.pkl')
-    
-    future_ram_usage = predict_future('ram_usage', model, scaler, data, time_steps).reshape(-1,1)
-    
-    
-    
-    all_pred = np.hstack((future_temp_cpu, future_temp_gpu, future_cpu_usage, future_gpu_usage, future_ram_usage))
-    
-    print(all_pred)
-    
+        
+        
+        future_temp_cpu = predict_future('temp_cpu', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model, scaler, time_steps = load_saved_model('cpu_usage_if_gpu.h5', 'cpu_usage_if_gpu_scaler.pkl')
+        
+        future_cpu_usage = predict_future('cpu_usage', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model,scaler, time_steps = load_saved_model('temp_gpu.h5', 'temp_gpu_scaler.pkl')
+        
+        future_temp_gpu = predict_future('temp_gpu', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model,scaler, time_steps = load_saved_model('gpu_usage.h5', 'gpu_usage_scaler.pkl')
+        
+        future_gpu_usage = predict_future('gpu_usage', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model,scaler, time_steps = load_saved_model('ram_usage_if_gpu.h5', 'ram_usage_if_gpu_scaler.pkl')
+        
+        future_ram_usage = predict_future('ram_usage', model, scaler, data, time_steps).reshape(-1,1)
+        
+        
+        
+        all_pred = np.hstack((future_temp_cpu, future_temp_gpu, future_cpu_usage, future_gpu_usage, future_ram_usage))
+        
+        return all_pred
+    else:
+        model, scaler, time_steps = load_saved_model('temp_cpu_if_not_gpu.h5', 'temp_cpu_if_not_gpu_scaler.pkl')
+        
+        future_temp_cpu = predict_future('temp_cpu', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model, scaler, time_steps = load_saved_model('cpu_usage_if_not_gpu.h5', 'cpu_usage_if_not_gpu_scaler.pkl')
+        
+        future_temp_cpu = predict_future('cpu_usage', model, scaler, data, time_steps).reshape(-1,1)
+        
+        model, scaler, time_steps = load_saved_model('ram_usage_if_not_gpu.h5', 'ram_usage_if_not_gpu_scaler.pkl')
+        
+        future_temp_cpu = predict_future('ram_usage', model, scaler, data, time_steps).reshape(-1,1)
+        
+        return np.hstack((future_temp_cpu, future_cpu_usage, future_ram_usage))
+        
 def all_model_reset(has_gpu=False):
     all_model_remove()
     if has_gpu:
@@ -320,7 +354,10 @@ def all_model_reset(has_gpu=False):
         create_and_train_model('temp_gpu.h5', 'temp_gpu_scaler.pkl', 'temp_gpu', 30, 500)
         create_and_train_model('gpu_usage.h5', 'gpu_usage_scaler.pkl', 'gpu_usage', 30, 500)
         create_and_train_model('ram_usage_if_gpu.h5', 'ram_usage_if_gpu_scaler.pkl', 'ram_usage', 30, 500)
-
+    else:
+        create_and_train_model('temp_cpu_if_not_gpu.h5', 'temp_cpu_if_not_gpu_scaler.pkl', 30, 500)
+        create_and_train_model('cpu_usage_if_not_gpu.h5', 'cpu_usage_if_not_gpu_scaler.pkl', 30, 500)
+        create_and_train_model('ram_usage_if_not_gpu.h5', 'ram_usage_if_not_gpu_scaler.pkl', 30, 500)
 
 #all_model_reset(1)
 all_predict(60)
