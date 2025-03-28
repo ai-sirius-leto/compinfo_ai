@@ -9,3 +9,4 @@ ujson
 scikit-learn
 pandas
 pynput
+tensorflow==2.12.0

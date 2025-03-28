@@ -17,7 +17,8 @@ dependencies = [
   "ujson",
   "scikit-learn",
   "pandas",
-  "pynput"
+  "pynput",
+  "tensorflow==2.12.0"
 ]
 
 [tool.flet]
