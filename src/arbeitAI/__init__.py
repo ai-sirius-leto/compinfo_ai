@@ -1,8 +1,1 @@
-from arbeitAI.predict import predict
-from arbeitAI.utils import to_model
-from arbeitAI.temp_cpu import learn_model_temp_cpu_if_not_gpu, predict_temp_cpu_if_not_gpu, learn_model_temp_cpu_if_gpu, predict_temp_cpu_if_gpu
-from arbeitAI.usage_cpu import learn_model_cpu_usage_if_not_gpu, predict_usage_cpu_if_not_gpu, learn_model_cpu_usage_if_gpu, predict_usage_cpu_if_gpu
-from arbeitAI.ram_usage import predict_ram_if_not_gpu, learn_model_ram_if_not_gpu, learn_model_ram_if_gpu, predict_ram_if_gpu
-from arbeitAI.model import modelka
-from arbeitAI.usage_gpu import learn_model_usage_gpu, predict_usage_gpu
-from arbeitAI.temp_gpu import learn_model_temp_gpu, predict_temp_gpu
+from arbeitAI.predict import all_predict, all_model_reset

@@ -7,10 +7,7 @@ import psutil
 import time
 
 from analysis import analysis, read_all, read_last
-from arbeitAI.predict import predict
-from arbeitAI.ram_usage import predict_ram_if_not_gpu
-from arbeitAI.temp_cpu import predict_temp_cpu_if_not_gpu
-from arbeitAI.usage_cpu import predict_usage_cpu_if_not_gpu
+from arbeitAI import all_predict
 from utils import get_settings, get_uptime_str, smooth_resize, translate
 
 import matplotlib
@@ -44,12 +41,7 @@ def page_chart(page: ft.Page):
         fig, axs = plt.subplots()
         
         # Predict `predict_ms` milliseconds
-        for i in range(1, (predict_ms // 1000) + 1):
-            predicted = predict(points, ut+i*1000)
-            if predicted_points.size == 0:
-                predicted_points = np.array(predicted)
-            else:
-                predicted_points = np.vstack((predicted_points, predicted))
+        predicted_points = all_predict(False, predict_ms // 1000)
 
         def get_x_y(x_arr_column, y_arr_column, start, end):
             m = (x_arr_column >= start) & (x_arr_column <= end)
