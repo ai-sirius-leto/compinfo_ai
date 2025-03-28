@@ -1,0 +1,11 @@
+psutil
+GPUtil
+setuptools
+flet
+ufpy
+matplotlib
+numpy
+ujson
+scikit-learn
+pandas
+pynput
