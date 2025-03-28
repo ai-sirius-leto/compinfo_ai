@@ -1,20 +1,5 @@
-class A:
-    def __init__(self):
-        self.__lol = 'lol'
-    
-    @property
-    def lol(self) -> str:
-        return self.__lol
+from pages.now import page_now
 
-    @lol.setter
-    def lol(self, new_lol: str):
-        self.__lol = new_lol
-        
-a = A()
-l = {a: ['lol']}
+import flet as ft
 
-for k, v in l.items():
-    for i in v:
-        k.__setattr__(i, '12')
-
-print(a.lol)    
+ft.app(page_now)

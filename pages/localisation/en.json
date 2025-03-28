@@ -1,28 +1,36 @@
 {
     "wintitle": "The Predictor",
     "navbar": {
-        "now": "Now",
-        "chart": "Chart",
-        "settings": "Settings"
+      "now": "Now",
+      "chart": "Chart",
+      "settings": "Settings"
     },
     "now": {
-        "uptime": "Uptime",
-        "cpu": "CPU",
-        "gpu": "GPU",
-        "analysis": "Analysis's in progress"
+      "uptime": "Uptime",
+      "cpu": "CPU",
+      "gpu": "GPU",
+      "analysis": "Analysis's in progress"
     },
     "chart": {
-        "xaxis_title": "Uptime"
+      "xaxis_title": "Uptime"
     },
     "data": {
-        "temp_cpu": "CPU's temperature",
-        "cpu_usage": "CPU's usage",
-        "temp_gpu": "GPU's temperature",
-        "gpu_usage": "GPU's usage",
-        "ram_usage": "RAM's usage"
+      "temp_cpu": "CPU's temperature",
+      "cpu_usage": "CPU's usage",
+      "temp_gpu": "GPU's temperature",
+      "gpu_usage": "GPU's usage",
+      "ram_usage": "RAM's usage"
     },
     "settings": {
-        "title": "Settings",
-        "lang": "Language"
+      "title": "Settings",
+      "lang": "Language",
+      "theme": "Theme",
+      "theme_tip": "Tip: Use Shift key to change themes in reverse order",
+      "pr_sc": {
+        "text": "Predict seconds",
+        "slider": {
+          "label": "s"
+        }
+      }
     }
 }
