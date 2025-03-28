@@ -1,0 +1,31 @@
+[project]
+name = "The Predictor"
+version = "1.0.0"
+description = "App which're getting computer's indicators to predict future ones using AI"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "bleudev", email = "aitiiigg1@gmail.com" }
+]
+dependencies = [
+  "flet",
+  "psutil",
+  "GPUtil",
+  "setuptools",
+  "matplotlib",
+  "numpy",
+  "ujson",
+  "scikit-learn",
+  "pandas",
+  "pynput",
+  "tensorflow==2.12.0"
+]
+
+[tool.flet]
+org = "com.predictor"
+product = "The Predictor"
+company = "The Predictor"
+copyright = "Copyright (C) 2025 by The Predictor"
+
+[tool.flet.app]
+path = "src"

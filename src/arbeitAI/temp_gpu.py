@@ -16,18 +16,7 @@ def learn_model_temp_gpu(sl: np.ndarray):
     
     X = neue[:,:-1]
     Y = neue[:,-1:]
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     return modelka(X, Y)
 def predict_temp_gpu(sl: np.ndarray):
     
