@@ -2,9 +2,9 @@ psutil
 GPUtil
 setuptools
 flet
-ufpy
 matplotlib
 numpy
 ujson
 scikit-learn
+tensorflow==2.12.0
 pandas
