@@ -302,11 +302,10 @@ def all_predict(has_gpu, time_steps):
         
     data = n.values[-30:, :]
         
-    data = np.hstack((data[:, :2], data[:, 3:]))
     if has_gpu:
         model, scaler, time_steps = load_saved_model('temp_cpu_if_gpu.h5', 'temp_cpu_if_gpu_scaler.pkl')
     
-        
+        data = np.hstack((data[:, :2], data[:, 3:]))
         
         future_temp_cpu = predict_future('temp_cpu', model, scaler, data, time_steps).reshape(-1,1)
         
@@ -332,6 +331,8 @@ def all_predict(has_gpu, time_steps):
         
         return all_pred
     else:
+        
+        
         model, scaler, time_steps = load_saved_model('temp_cpu_if_not_gpu.h5', 'temp_cpu_if_not_gpu_scaler.pkl')
         
         future_temp_cpu = predict_future('temp_cpu', model, scaler, data, time_steps).reshape(-1,1)
