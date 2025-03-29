@@ -6,7 +6,7 @@ import os
 
 # Create dataframe if not exist
 try:
-    pd.read_csv('data.csv')
+    pd.read_csv('src/data.csv')
 except pd.errors.EmptyDataError:
     df = pd.DataFrame({
         'uptime': [],
@@ -17,10 +17,10 @@ except pd.errors.EmptyDataError:
         'gpu_usage': [],
         'ram_usage': []
     })
-    df.to_csv('data.csv', index=False)
+    df.to_csv('src/data.csv', index=False)
 
 def write(uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_usage):
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/data.csv')
     df.loc[len(df)] = {
         'uptime': uptime,
         'temp_cpu': temp_cpu,
@@ -30,14 +30,14 @@ def write(uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_u
         'gpu_usage': gpu_usage,
         'ram_usage': ram_usage
     }
-    df.to_csv('data.csv', index=False)
+    df.to_csv('src/data.csv', index=False)
 
 def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/data.csv')
     return [list(df.loc[i]) for i in range(len(df))]
 
 def read_last() -> tuple[int, float, float, float, float, float, float]:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/data.csv')
     return tuple(df.loc[len(df)-1]) # get last series
      
 class State:
@@ -97,6 +97,5 @@ def analysis():
     ram_usage = psutil.virtual_memory().percent
  
     write(uptime, cpu_temp, avg_crit, gpu_temp, cpu_usage, gpu_usage, ram_usage)
-
 if __name__ == '__main__':
     analysis()

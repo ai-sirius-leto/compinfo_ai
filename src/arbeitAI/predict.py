@@ -45,14 +45,14 @@ from collections import deque
 import os
 
 def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/data.csv')
     return [list(df.loc[i]) for i in range(len(df))]
 
 def read_last() -> tuple[int, float, float, float, float, float, float]:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/data.csv')
     return tuple(df.loc[len(df)-1]) # get last series
 def create_and_train_model(model_filename, scaler_filename, target_column, time_steps=30, epochs=25):
-    data = pd.read_csv('data.csv')
+    data = pd.read_csv('src/data.csv')
     feat = ['uptime', 'temp_cpu', 'cpu_usage', 'ram_usage']
     if read_last()[3] != -1:
         feat.extend(['temp_gpu', 'gpu_usage'])
@@ -279,53 +279,57 @@ def predict_future(target_column, model, scaler, initial_data, steps = 30, base_
     return np.array(predictions)
     
     
-def all_model_remove():
-    try:
-        os.remove('LSTM/models/temp_cpu_if_gpu.h5')
-        os.remove('LSTM/models/scalers/temp_cpu_if_gpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/cpu_usage_if_gpu.h5')
-        os.remove('LSTM/models/scalers/cpu_usage_if_gpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/gpu_usage.h5')
-        os.remove('LSTM/models/scalers/gpu_usage_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/temp_gpu.h5')
-        os.remove('LSTM/models/scalers/temp_cpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/ram_usage_if_gpu.h5')
-        os.remove('LSTM/models/scalers/ram_usage_if_gpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/ram_usage_if_not_gpu.h5')
-        os.remove('LSTM/models/scalers/ram_usage_if_not_gpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/cpu_usage_if_not_gpu.h5')
-        os.remove('LSTM/models/scalers/cpu_usage_if_not_gpu_scaler.pkl')
-    except:
-        pass
-    try:
-        os.remove('LSTM/models/temp_cpu_if_not_gpu.h5')
-        os.remove('LSTM/models/scalers/temp_cpu_if_not_gpu_scaler.pkl')
-    except:
-        pass
+def all_model_remove(s):
+    if s:
+        try:
+            os.remove('LSTM/models/temp_cpu_if_gpu.h5')
+            os.remove('LSTM/models/scalers/temp_cpu_if_gpu_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/cpu_usage_if_gpu.h5')
+            os.remove('LSTM/models/scalers/cpu_usage_if_gpu_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/gpu_usage.h5')
+            os.remove('LSTM/models/scalers/gpu_usage_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/temp_gpu.h5')
+            os.remove('LSTM/models/scalers/temp_cpu_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/ram_usage_if_gpu.h5')
+            os.remove('LSTM/models/scalers/ram_usage_if_gpu_scaler.pkl')
+        except:
+            pass
+    else:
+        try:
+            os.remove('LSTM/models/ram_usage_if_not_gpu.h5')
+            os.remove('LSTM/models/scalers/ram_usage_if_not_gpu_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/cpu_usage_if_not_gpu.h5')
+            os.remove('LSTM/models/scalers/cpu_usage_if_not_gpu_scaler.pkl')
+        except:
+            pass
+        try:
+            os.remove('LSTM/models/temp_cpu_if_not_gpu.h5')
+            os.remove('LSTM/models/scalers/temp_cpu_if_not_gpu_scaler.pkl')
+        except:
+            pass
 
 def all_predict(has_gpu, time_steps):
-    n = pd.read_csv('data.csv')
+    n = pd.read_csv('src/data.csv')
         
     data = n.values[-30:, :]
-        
+    
+    kriti = n.values[-30:, 2:3]
+    
     if has_gpu:
         
         data = np.hstack((data[:, :2], data[:, 3:]))
@@ -352,12 +356,14 @@ def all_predict(has_gpu, time_steps):
         
         
         
-        all_pred = np.hstack((data[:, :1] + 1000, future_temp_cpu, future_temp_gpu, future_cpu_usage, future_gpu_usage, future_ram_usage))
+        all_pred = np.hstack((data[:, :1] + 1000, future_temp_cpu, kriti, future_temp_gpu, future_cpu_usage, future_gpu_usage, future_ram_usage))
         
         return all_pred
     else:
         data = np.hstack((data[:, :1], data[:, 1:2], data[:, 4:5], data[:, 6:]))
 
+
+        notigs = n.values[-30:, 3:4]
 
         model, scaler, time_steps = load_saved_model('temp_cpu_if_not_gpu.h5', 'temp_cpu_if_not_gpu_scaler.pkl')
         
@@ -371,10 +377,10 @@ def all_predict(has_gpu, time_steps):
         
         future_ram_usage = predict_future('ram_usage', model, scaler, data, time_steps).reshape(-1,1)
         
-        return np.hstack((data[:, :1] + 1000, future_temp_cpu, 100, -1, future_cpu_usage, -1, future_ram_usage))
+        return np.hstack((data[:, :1] + 1000, future_temp_cpu, kriti, notigs, future_cpu_usage, notigs, future_ram_usage))
     
 def all_model_reset(has_gpu=False):
-    all_model_remove()
+    all_model_remove(has_gpu)
     if has_gpu:
         create_and_train_model('temp_cpu_if_gpu.h5', 'temp_cpu_if_gpu_scaler.pkl', 'temp_cpu', 30, 500)
         create_and_train_model('cpu_usage_if_gpu.h5', 'cpu_usage_if_gpu_scaler.pkl', 'cpu_usage', 30, 500)
@@ -386,5 +392,14 @@ def all_model_reset(has_gpu=False):
         create_and_train_model('cpu_usage_if_not_gpu.h5', 'cpu_usage_if_not_gpu_scaler.pkl', 'cpu_usage', 30, 500)
         create_and_train_model('ram_usage_if_not_gpu.h5', 'ram_usage_if_not_gpu_scaler.pkl', 'ram_usage', 30, 500)
 
+'''
+all_model_reset(flag) - убивает все модели с видеокартой, если flag = True, или без неё, если False
+Сразу же обучает на имеющейся дате новые модели выбранного флага
 
+all_predict(flag, n) - возвращает n строк - предсказаний на будущее, с видеокартой если True, и без неё если False
 
+all_model_remove(flag) - просто убивает все модели с видокарткой если True, иначе без
+
+update_model(model_filename, scaler_filename, new_data_path, epochs=10 ) - дообучает модель model_filename 
+в соотсветствие с её scaler, беря информацию из пути new_data_path, и используя 10 эпох
+'''
