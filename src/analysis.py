@@ -4,9 +4,12 @@ import GPUtil
 import pandas as pd
 import os
 
+from arbeitAI.predict import DATA_PATH
+
 # Create dataframe if not exist
+
 try:
-    pd.read_csv('src/data.csv')
+    pd.read_csv(DATA_PATH)
 except pd.errors.EmptyDataError:
     df = pd.DataFrame({
         'uptime': [],
@@ -17,10 +20,10 @@ except pd.errors.EmptyDataError:
         'gpu_usage': [],
         'ram_usage': []
     })
-    df.to_csv('src/data.csv', index=False)
+    df.to_csv(DATA_PATH, index=False)
 
 def write(uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_usage):
-    df = pd.read_csv('src/data.csv')
+    df = pd.read_csv(DATA_PATH)
     df.loc[len(df)] = {
         'uptime': uptime,
         'temp_cpu': temp_cpu,
@@ -30,14 +33,14 @@ def write(uptime, temp_cpu, crit_temp_cpu, temp_gpu, cpu_usage, gpu_usage, ram_u
         'gpu_usage': gpu_usage,
         'ram_usage': ram_usage
     }
-    df.to_csv('src/data.csv', index=False)
+    df.to_csv(DATA_PATH, index=False)
 
 def read_all() -> list[tuple[int, float, float, float, float, float, float]]:
-    df = pd.read_csv('src/data.csv')
+    df = pd.read_csv(DATA_PATH)
     return [list(df.loc[i]) for i in range(len(df))]
 
 def read_last() -> tuple[int, float, float, float, float, float, float]:
-    df = pd.read_csv('src/data.csv')
+    df = pd.read_csv(DATA_PATH)
     return tuple(df.loc[len(df)-1]) # get last series
      
 class State:

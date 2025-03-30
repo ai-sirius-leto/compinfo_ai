@@ -1,5 +1,5 @@
 [project]
-name = "The Predictor"
+name = "predictor"
 version = "1.0.0"
 description = "App which're getting computer's indicators to predict future ones using AI"
 readme = "README.md"
