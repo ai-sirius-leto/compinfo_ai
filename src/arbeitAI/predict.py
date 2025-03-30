@@ -1,3 +1,4 @@
+from typing import Optional
 import pandas as pd
 import numpy as np
 import pickle
@@ -22,6 +23,10 @@ SCALER_IF_NOT_GPU_PATH = f'{SCALERS_DIR}/if_not_gpu.pkl'
 MODEL_IF_GPU_PATH = f'{MODELS_DIR}/if_gpu.h5'
 SCALER_IF_GPU_PATH = f'{SCALERS_DIR}/if_gpu.pkl'
 
+def get_flag_has_gpu():
+    data = pd.read_csv(DATA_PATH)
+    return np.array(data['temp_gpu'])[-1] != -1
+
 def create_and_save_joint_model(model_path, scaler_path, time_steps = 30, epochs = 25, has_gpu = True):
     data = pd.read_csv(DATA_PATH)
     
@@ -29,13 +34,10 @@ def create_and_save_joint_model(model_path, scaler_path, time_steps = 30, epochs
     scaler_filename = scaler_path
     
     if has_gpu:
-        features = ['uptime', 'temp_cpu', 'temp_gpu', 'cpu_usage', 'gpu_usage', 'ram_usage']
         features_to_predict = ['temp_cpu', 'temp_gpu', 'cpu_usage', 'gpu_usage', 'ram_usage']
     else:
-        features = ['uptime', 'temp_cpu', 'cpu_usage', 'ram_usage'] 
         features_to_predict = ['temp_cpu', 'cpu_usage', 'ram_usage']
     
-    all_data = data[features].values
     data_to_predict = data[features_to_predict].values
     
     scaler = StandardScaler()
@@ -144,15 +146,21 @@ def load_joint_model(has_gpu=True):
     with open(scaler_path, 'rb') as f:
         scaler = pickle.load(f)    
     return model, scaler
-def model_reset(has_gpu=True):
+
+def model_reset(has_gpu: Optional[bool] = None):
+    if has_gpu is None:
+        has_gpu = get_flag_has_gpu()
+
+    model_remove(has_gpu)
     if has_gpu:
-        model_remove(True)
         create_and_save_joint_model(MODEL_IF_GPU_PATH, SCALER_IF_GPU_PATH, epochs=500, has_gpu=True)
     else:
-        model_remove(False)
         create_and_save_joint_model(MODEL_IF_NOT_GPU_PATH, SCALER_IF_NOT_GPU_PATH, epochs=500, has_gpu=False)
         
-def all_predict(has_gpu, n):
+def all_predict(n: int, has_gpu: Optional[bool] = None):
+    if has_gpu is None:
+        has_gpu = get_flag_has_gpu()
+
     model, scaler = load_joint_model(has_gpu)
     data = pd.read_csv('data.csv')
     features = ['uptime', 'temp_cpu', 'temp_gpu', 'cpu_usage', 'gpu_usage', 'ram_usage'] if has_gpu else ['uptime', 'temp_cpu', 'cpu_usage', 'ram_usage']

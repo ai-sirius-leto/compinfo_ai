@@ -41,7 +41,7 @@ def page_chart(page: ft.Page):
         fig, axs = plt.subplots()
         
         # Predict `predict_ms` milliseconds
-        predicted_points = all_predict(False, predict_ms // 1000)
+        predicted_points = all_predict(predict_ms // 1000)
 
         def get_x_y(x_arr_column, y_arr_column, start, end):
             m = (x_arr_column >= start) & (x_arr_column <= end)
